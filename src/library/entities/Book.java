@@ -5,6 +5,13 @@ import library.interfaces.entities.IBook;
 import library.interfaces.entities.ILoan;
 
 public class Book implements IBook{
+	
+	private String author;
+	private String title;
+	private String callNumber;
+	private int bookID;
+	private ILoan loan;
+	private EBookState state = EBookState.AVAILABLE;
 
 	// Constructor
 	public Book(String author, String title, String callNumber, int bookID) {
@@ -17,73 +24,113 @@ public class Book implements IBook{
 		// Throw exception if not valid
 		if (!isValid)
 			throw new IllegalArgumentException("Invalid entry.");
+		else {
+			this.author = author;
+			this.title = title;
+			this.callNumber = callNumber;
+			this.bookID = bookID;
+		}
 		
 	}
 	
 	@Override
 	public void borrow(ILoan loan) {
-		// TODO Auto-generated method stub
+		
+		if (this.state != EBookState.AVAILABLE)
+			throw new RuntimeException("Book is not currently available.");
+		else {
+			this.loan = loan;
+			this.state = EBookState.ON_LOAN;
+		}
 		
 	}
 
 	@Override
 	public ILoan getLoan() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return this.loan;
 	}
 
 	@Override
 	public void returnBook(boolean damaged) {
-		// TODO Auto-generated method stub
+		
+		if (this.state != EBookState.ON_LOAN)
+			throw new RuntimeException("Book is not currently on loan.");
+		else {
+			if (damaged)
+				this.state = EBookState.DAMAGED;
+			else
+				this.state = EBookState.AVAILABLE;
+			this.loan = null;
+			
+		}
 		
 	}
 
 	@Override
 	public void lose() {
-		// TODO Auto-generated method stub
+		
+		if (this.state != EBookState.ON_LOAN)
+			throw new RuntimeException("Book is not currently on loan.");
+		else
+			this.state = EBookState.LOST;
 		
 	}
 
 	@Override
 	public void repair() {
-		// TODO Auto-generated method stub
+		
+		if (this.state != EBookState.DAMAGED)
+			throw new RuntimeException("Book is not currently damaged.");
+		else
+			this.state = EBookState.AVAILABLE;
 		
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		
+		if (this.state == EBookState.ON_LOAN || this.state == EBookState.DISPOSED)
+			throw new RuntimeException("Book is not currently in a disposable state.");
 		
 	}
 
 	@Override
 	public EBookState getState() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return this.state;
 	}
 
 	@Override
 	public String getAuthor() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return this.author;
 	}
 
 	@Override
 	public String getTitle() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return this.title;
+		
 	}
 
 	@Override
 	public String getCallNumber() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return this.callNumber;
 	}
 
 	@Override
 	public int getID() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return this.bookID;
 	}
+	
+	public void setState(EBookState state) {
+		
+		this.state = state;
+		
+	}
+	
 
 }
