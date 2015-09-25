@@ -92,6 +92,8 @@ public class Book implements IBook{
 		
 		if (this.state == EBookState.ON_LOAN || this.state == EBookState.DISPOSED)
 			throw new RuntimeException("Book is not currently in a disposable state.");
+		else
+			this.state = EBookState.DISPOSED;
 		
 	}
 
@@ -130,7 +132,6 @@ public class Book implements IBook{
 		
 		this.state = state;
 		
-	}
-	
+	}	
 
 }
