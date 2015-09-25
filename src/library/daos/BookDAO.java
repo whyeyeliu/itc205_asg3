@@ -97,5 +97,17 @@ public class BookDAO implements IBookDAO {
 		return authorTitle;		
 		
 	}
+	
+	public int getSize() {
+		
+		return books.size();
+		
+	}
+	
+	public void clearList() {
+		
+		books.clear();
+		
+	}
 
 }
