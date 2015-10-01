@@ -13,18 +13,11 @@ public class BookTest {
 	private Loan l;
 	private Book b;
 
-	// Create a new Loan object for each test
+	// Create new Book and Loan object for each test
 	@Before
-	public void newLoan() {
+	public void setUp() {
 		
-		this.l = new Loan();
-		
-	}
-	
-	// Create a new Book object for each test
-	@Before
-	public void newBook() {
-		
+		this.l = mock(Loan.class);
 		this.b = new Book("John Doe", "Good Book", "100", 1);
 		
 	}
