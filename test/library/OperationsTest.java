@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 import library.daos.BookDAO;
 import library.daos.LoanMapDAO;
 import library.daos.MemberMapDAO;
+import library.interfaces.EBorrowState;
+import library.interfaces.IBorrowUI;
 import library.interfaces.daos.IBookDAO;
 import library.interfaces.daos.ILoanDAO;
 import library.interfaces.daos.IMemberDAO;
@@ -12,6 +14,9 @@ import library.interfaces.hardware.ICardReader;
 import library.interfaces.hardware.IDisplay;
 import library.interfaces.hardware.IPrinter;
 import library.interfaces.hardware.IScanner;
+import library.panels.borrow.ABorrowPanel;
+import library.panels.borrow.ScanningPanel;
+import library.panels.borrow.SwipeCardPanel;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,7 +24,7 @@ import org.junit.Test;
 
 public class OperationsTest {
 	
-	private BorrowUC_UI ui;
+	private IBorrowUI ui;
 	private ICardReader reader;
 	private IScanner scanner;
 	private IPrinter printer; 
@@ -33,7 +38,7 @@ public class OperationsTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		this.ui = mock(BorrowUC_UI.class);
+		this.ui = mock(ABorrowPanel.class);
 		this.reader = mock(ICardReader.class);
 		this.scanner = mock(IScanner.class);
 		this.printer = mock(IPrinter.class);
@@ -63,9 +68,34 @@ public class OperationsTest {
 		
 	}
 
+	// Test that the initialise() operation works as intended
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testInitialiseMethod() {
+		
+		assertEquals(ctl.getState(), EBorrowState.CREATED);		
+		ctl.initialise();
+		verify(display).getDisplay();
+		verify(ui).setState(EBorrowState.INITIALIZED);
+		verify(reader).setEnabled(true);
+		verify(scanner).setEnabled(false);
+		assertEquals(ctl.getState(), EBorrowState.INITIALIZED);
+		
+	}
+	
+	// Test swipeCard operation when not restricted
+	@Test
+	public void testSwipeCardNotRestricted() {
+		
+		memberDAO.addMember("First", "Last", "1234", "abcd");
+		
+		ctl.initialise();
+		assertEquals(ctl.getState(), EBorrowState.INITIALIZED);
+		ctl.cardSwiped(1);
+		verify(ui).setState(EBorrowState.SCANNING_BOOKS);
+		verify(reader).setEnabled(false);
+		verify(scanner).setEnabled(true);
+		assertEquals(ctl.getState(), EBorrowState.SCANNING_BOOKS);
+		
 	}
 
 }
