@@ -64,6 +64,24 @@ public class BorrowUC_CTL implements ICardReaderListener,
 		state = EBorrowState.CREATED;
 	}
 	
+	// Custom constructor with dependency injection for testing
+	public BorrowUC_CTL(ICardReader reader, IScanner scanner, 
+			IPrinter printer, IDisplay display,
+			IBookDAO bookDAO, ILoanDAO loanDAO, IMemberDAO memberDAO, 
+			IBorrowUI borrowUI ) {
+
+		this(reader, scanner, printer, display, bookDAO, loanDAO, memberDAO);
+		this.ui = borrowUI;
+
+	}
+	
+	// Accessor method to get current state
+	public EBorrowState getState() {
+		
+		return state;
+		
+	}
+	
 	public void initialise() {
 		previous = display.getDisplay();
 		display.setDisplay((JPanel) ui, "Borrow UI");		

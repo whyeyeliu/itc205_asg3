@@ -13,7 +13,7 @@ public class BookDAOTest {
 	BookDAO bookData = new BookDAO(helper);
 
 	@Before
-	public void addBooksToList() {
+	public void setUp() {
 		
 		bookData.addBook("Mark", "Good book", "abcdef");
 		bookData.addBook("Tom", "Nice book", "293kds");
@@ -26,7 +26,7 @@ public class BookDAOTest {
 	}
 	
 	@After
-	public void clearAll() {
+	public void tearDown() {
 		
 		bookData.clearList();
 		helper.resetCount();

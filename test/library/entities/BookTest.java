@@ -25,7 +25,7 @@ public class BookTest {
 	// Test for invalid parameter entry to Book constructor
 	@Test (expected = IllegalArgumentException.class)
 	public void parameterTest() {
-		
+				
 		new Book("John Doe", null, "100", 1);
 		
 	}
@@ -33,7 +33,7 @@ public class BookTest {
 	// Try to borrow an unavailable book
 	@Test (expected = RuntimeException.class)
 	public void borrowUnavailableBook() {
-		
+				
 		b.setState(EBookState.DAMAGED);
 		b.borrow(l);
 		
@@ -120,7 +120,6 @@ public class BookTest {
 		b.dispose();
 		assertTrue(b.getState() == EBookState.DISPOSED);
 		
-	}
-	
+	}	
 
 }
