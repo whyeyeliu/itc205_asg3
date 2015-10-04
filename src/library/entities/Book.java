@@ -128,6 +128,12 @@ public class Book implements IBook{
 		return this.bookID;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("Id: %d\nAuthor: %s\nTitle: %s\nCall Number %s",
+				bookID, author, title, callNumber);
+	}
+	
 	public void setState(EBookState state) {
 		
 		this.state = state;
