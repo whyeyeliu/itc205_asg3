@@ -333,7 +333,7 @@ public class OperationsTest {
 		System.out.println("-------- Start test --------");
 		System.out.println("Test swipeCard operation with maxed out fine:");
 		
-		// Create member with a fine
+		// Create member with maxed out fine
 		IMember m = memberDAO.addMember("First", "Last", "1234", "abcd");
 		m.addFine(10.0f);
 		
