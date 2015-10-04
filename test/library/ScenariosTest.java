@@ -1,9 +1,11 @@
 package library;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Calendar;
@@ -42,12 +44,11 @@ public class ScenariosTest {
 	private IScanner scanner;
 	private IPrinter printer; 
 	private IDisplay display;
+	private BorrowUC_CTL ctl;
 	
 	private static IBookDAO bookDAO;
 	private static IMemberDAO memberDAO;
 	private static ILoanDAO loanDAO;
-	
-	private static BorrowUC_CTL ctl;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -124,7 +125,7 @@ public class ScenariosTest {
 		this.printer = mock(IPrinter.class);
 		this.display = mock(IDisplay.class);
 		
-		ctl = new BorrowUC_CTL(reader, scanner, printer, display,
+		this.ctl = new BorrowUC_CTL(reader, scanner, printer, display,
 				bookDAO, loanDAO, memberDAO, ui);
 		
 	}
@@ -137,29 +138,82 @@ public class ScenariosTest {
 		this.scanner = null;
 		this.printer = null;
 		this.display = null;
-		
-		memberDAO = null;
-		loanDAO = null;
-		ctl = null;
+		this.ctl = null;
 		
 	}
 
+	// Test the happy day scenario
 	@Test
 	public void testHappyDayScenario() {
 		
 		System.out.println("-------- Start test --------");
+		System.out.println("Test the happy day scenario:");
 		ctl.initialise();
 		ctl.cardSwiped(1);
+		ctl.bookScanned(10);
+		ctl.scansCompleted();
+		ctl.loansConfirmed();
 		
-		verify(ui).setState(EBorrowState.SCANNING_BOOKS);
-		verify(reader).setEnabled(false);
-		verify(scanner).setEnabled(true);
-		verify(ui).displayMemberDetails(anyInt(), anyString(), anyString());
-		verify(ui).displayExistingLoan(anyString());
+		verify(ui).setState(EBorrowState.COMPLETED);
+		verify(reader, atLeast(3)).setEnabled(false);
+		verify(scanner, atLeast(3)).setEnabled(false);
+		verify(printer).print(anyString());
+		
+		// Check that the correct book has been added to a loan for the member
+		assertEquals(memberDAO.getMemberByID(1).getLoans().get(0).getBook().getID(), 10);		
+		assertEquals(ctl.getState(), EBorrowState.COMPLETED);
+		
+		System.out.println("-------- End of test --------\n");
+		
+	}
+	
+	// Test the reject books scenario
+	@Test
+	public void testRejectScenario() {
+		
+		System.out.println("-------- Start test --------");
+		System.out.println("Test the reject books scenario:");
+		ctl.initialise();
+		ctl.cardSwiped(1);
+		ctl.bookScanned(10);
+		ctl.loansRejected();
+		
+		verify(ui, times(2)).setState(EBorrowState.SCANNING_BOOKS);
+		verify(reader, times(1)).setEnabled(true);
+		verify(reader, times(2)).setEnabled(false);
+		verify(scanner, times(2)).setEnabled(true);
+		verify(scanner, times(1)).setEnabled(false);
+		verify(printer, never()).print(anyString());
+		
+		// Check that pending loan display has been cleared
+		verify(ui, times(2)).displayPendingLoan("");
 		
 		assertEquals(ctl.getState(), EBorrowState.SCANNING_BOOKS);
 		
-		//fail("Not yet implemented");
+		System.out.println("-------- End of test --------\n");
+		
+	}
+	
+	// Test borrowing restricted scenario
+	@Test
+	public void testRestrictedScenario() {
+		
+		System.out.println("-------- Start test --------");
+		System.out.println("Test the borrowing restricted scenario:");
+		ctl.initialise();
+		ctl.cardSwiped(2);
+		ctl.cancelled();
+		
+		verify(ui).setState(EBorrowState.CANCELLED);
+		verify(reader, times(2)).setEnabled(false);
+		verify(reader, times(1)).setEnabled(true);
+		verify(scanner, times(3)).setEnabled(false);
+		verify(scanner, never()).setEnabled(true);
+				
+		assertEquals(ctl.getState(), EBorrowState.CANCELLED);
+		
+		System.out.println("-------- End of test --------\n");
+		
 	}
 
 }
